@@ -157,6 +157,8 @@ update msg model =
           List.map
             (\o ->
               let
+                _ =
+                  Debug.log "weiow" _
                 newPosition =
                   Vector2.vec2
                     (Vector2.getX o.amplitude * sin (Vector2.getX o.angle))

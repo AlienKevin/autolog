@@ -7,7 +7,7 @@ import * as logMessage from "./logMessage";
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	let disposable = vscode.commands.registerCommand('extension.addElmLog', async () => {
+	vscode.commands.registerCommand('extension.addElmLog', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         return;
@@ -42,9 +42,34 @@ export function activate(context: vscode.ExtensionContext) {
           });
         }
 			}
-	});
-
-	context.subscriptions.push(disposable);
+  });
+  
+  vscode.commands.registerCommand(
+    "extension.commentAllElmLogs",
+    () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        return;
+      }
+      const tabSize = editor.options.tabSize;
+      const document = editor.document;
+      const logMessages = logMessage.detectAll(
+        document,
+        tabSize
+      );
+      editor.edit(editBuilder => {
+        logMessages.forEach(({ lines }) => {
+          lines.forEach(({ spaces, range }) => {
+            editBuilder.delete(range);
+            editBuilder.insert(
+              new vscode.Position(range.start.line, 0),
+              `${spaces}-- ${document.getText(range).trim()}\n`
+            );
+          });
+        });
+      });
+    }
+  );
 }
 
 // this method is called when your extension is deactivated

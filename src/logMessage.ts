@@ -23,7 +23,7 @@ function message(
   tabSize: any
 ) {
   const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar);
-  const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
+  const spacesBeforeMsg = spacesBeforeLog(document, lineOfSelectedVar, tabSize);
   const debuggingMsg = `_ = Debug.log "${selectedVar}" ${selectedVar}`;
   return `${
     lineOfLogMsg === document.lineCount ? "\n" : ""
@@ -48,57 +48,86 @@ function logMessageLine(document: vscode.TextDocument, selectionLine: number) {
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function spaces(document: vscode.TextDocument, line: number, tabSize: number): string {
+function spacesBeforeLog(document: vscode.TextDocument, line: number, tabSize: number): string {
   const currentLine = document.lineAt(line);
-  const currentLineTextChars = currentLine.text.split("");
+  if (line < document.lineCount - 1) { // before last line
     const nextLine = document.lineAt(line + 1);
     const nextLineTextChars = nextLine.text.split("");
+    // next line not empty
     if (nextLineTextChars.filter((char: string) => char !== " ").length !== 0) {
       if (
         nextLine.firstNonWhitespaceCharacterIndex >
         currentLine.firstNonWhitespaceCharacterIndex
       ) {
-        if (
-          nextLineTextChars[nextLine.firstNonWhitespaceCharacterIndex - 1] ===
-          "\t"
-        ) {
-          return " ".repeat(
-            nextLine.firstNonWhitespaceCharacterIndex * tabSize
-          );
-        } else {
-          return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
-        }
+        return spacesBeforeLine(document, line + 1, tabSize)
       } else {
-        if (
-          currentLineTextChars[
-            currentLine.firstNonWhitespaceCharacterIndex - 1
-          ] === "\t"
-        ) {
-          return " ".repeat(
-            currentLine.firstNonWhitespaceCharacterIndex * tabSize
-          );
-        } else {
-          return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
-        }
+        return spacesBeforeLine(document, line, tabSize);
       }
-    } else {
-      if (
-        currentLineTextChars[
-          currentLine.firstNonWhitespaceCharacterIndex - 1
-        ] === "\t"
-      ) {
-        return " ".repeat(
-          currentLine.firstNonWhitespaceCharacterIndex * tabSize
-        );
-      } else {
-        return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
-      }
+    } else { // next line is empty
+      return spacesBeforeLine(document, line, tabSize);
+    }
+  } else { // last line
+    return spacesBeforeLine(document, line, tabSize);
+  }
+}
+
+function spacesBeforeLine(document: vscode.TextDocument, line: number, tabSize: number): string {
+  const currentLine = document.lineAt(line);
+  const currentLineTextChars = currentLine.text.split("");
+  if (
+    currentLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] ===
+    "\t"
+  ) {
+    return " ".repeat(
+      currentLine.firstNonWhitespaceCharacterIndex * tabSize
+    );
+  } else {
+    return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
+  }
+}
+
+type LogLocation =
+({ lines: { spaces: string, range: vscode.Range }[]})
+
+function detectAll(document: vscode.TextDocument, tabSize: any): LogLocation[]
+ {
+  const documentNbrOfLines = document.lineCount;
+  const logMessages: ({ lines: { spaces: string, range: vscode.Range }[]})[] = [];
+  const logMessageRegexp = new RegExp(`^.*=\\s*\n?Debug.log.*`);
+  for (let i = 0; i < documentNbrOfLines; i++) {
+    const currLine = document.lineAt(i).text;
+    const nextLine = (
+      i >= documentNbrOfLines - 1
+        ? ""
+        : document.lineAt(i + 1).text
+    );
+    const logMessageLines: LogLocation = { lines: [] };
+    if (logMessageRegexp.test(currLine)) {
+      logMessageLines.lines.push({
+        spaces: spacesBeforeLine(document, i, tabSize),
+        range: document.lineAt(i).rangeIncludingLineBreak
+      });
+      logMessages.push(logMessageLines);
+    } else if (logMessageRegexp.test(currLine + "\n" + nextLine)) {
+      logMessageLines.lines.push({
+        spaces: spacesBeforeLine(document, i, tabSize),
+        range: document.lineAt(i).rangeIncludingLineBreak
+      });
+      logMessageLines.lines.push({
+        spaces: spacesBeforeLine(document, i + 1, tabSize),
+        range: document.lineAt(i + 1).rangeIncludingLineBreak
+      });
+      logMessages.push(logMessageLines);
+      i++;
     }
   }
+  return logMessages;
+}
 
 export {
   message,
   logMessageLine,
-  spaces
+  spacesBeforeLog as spaces,
+  detectAll
 }
 // module.exports.detectAll = detectAll;
