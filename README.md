@@ -67,6 +67,8 @@ By pressing <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>u</kbd>, you can **uncomment** 
 
   Default value: `"AL: "`
 
+  Set `autolog.prefix` to `""` (empty string) to produce unprefixed log messages. Note that Auto Log will now comment and uncomment all log messages in the file, regardless whether they are created using Auto Log.
+
 # License
 MIT
 
