@@ -8,7 +8,8 @@ type LogConfig =
     "wrapper": string,
     "match": string,
     "command": string,
-    "comment": string
+    "comment": string,
+    "prefix": string
   }
 
 function init():
@@ -16,7 +17,8 @@ function init():
     editor: vscode.TextEditor,
     logWrapper: string,
     logRegexp: string,
-    commentSymbol: string
+    commentSymbol: string,
+    logPrefix: string
   } | undefined
  {
   const editor = vscode.window.activeTextEditor;
@@ -26,17 +28,17 @@ function init():
   var {
     wrapper: logWrapper,
     match: logRegexp,
-    comment: commentSymbol } =
+    comment: commentSymbol,
+    prefix: logPrefix } =
   getLogConfig(editor.document.languageId);
   return {
     editor,
     logWrapper,
     logRegexp,
-    commentSymbol
+    commentSymbol,
+    logPrefix
   };
 }
-
-const logPrefix = "AL";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -49,6 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
         var {
           editor,
           logWrapper,
+          logPrefix
         } = vars;
       }
       const tabSize = editor.options.tabSize;
@@ -96,6 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
           editor,
           logRegexp,
           commentSymbol,
+          logPrefix
         } = vars;
       }
       const tabSize = editor.options.tabSize;
@@ -131,6 +135,7 @@ export function activate(context: vscode.ExtensionContext) {
           editor,
           logRegexp,
           commentSymbol,
+          logPrefix
         } = vars;
       }
       const tabSize = editor.options.tabSize;
@@ -160,8 +165,10 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function getLogConfig(lang: string): LogConfig {
-  let configs: any = convertKeysToLowerCase(vscode.workspace.getConfiguration("autolog.configs"));
-  return configs[lang.toLowerCase()] || configs['default'];
+  let languageConfigs: any = convertKeysToLowerCase(vscode.workspace.getConfiguration("autolog").languages);
+  const languageConfig = languageConfigs[lang.toLowerCase()] || languageConfigs['default'];
+  const prefix = vscode.workspace.getConfiguration("autolog").prefix;
+  return { ...languageConfig, ...{ prefix } };
 }
 
 // source: https://stackoverflow.com/a/12540603/6798201

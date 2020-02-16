@@ -19,36 +19,41 @@
 			"type": "object",
 			"title": "Auto Log Configurations for different languages",
 			"properties": {
-				"autolog.configs": {
+				"autolog.prefix": {
+					"type": "string",
+					"default": "AL",
+					"description": "The prefix of the log message."
+				},
+				"autolog.languages": {
 					"type": "object",
 					"default": {
 						"javascript": {
 							"wrapper": "console.log('$eSEL', $SEL)",
-							"match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?",
+							"match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?.*$",
 							"comment": "//"
 						},
 						"typescript": {
 							"wrapper": "console.log('$eSEL', $SEL)",
-							"match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?",
+							"match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?.*$",
 							"comment": "//"
 						},
 						"elm": {
 							"wrapper": "_ = Debug.log \"$eSEL\" <| $SEL",
-							"match": "^.*=\\s*(\n\\s*)?(\\-*\\s*)*Debug\\.log.*",
+							"match": "^.*=\\s*(\n\\s*)?(\\-*\\s*)*Debug\\.log.*$",
 							"comment": "--"
 						},
 						"python": {
 							"wrapper": "print('$eSEL', $SEL)",
-							"match": "^(.*\\b)?print\\(([^)]*)\\)",
+							"match": "^(.*\\b)?print\\(([^)]*)\\).*$",
 							"comment": "#"
 						},
 						"default": {
 							"wrapper": "print($SEL);",
-							"match": "^(.*\\b)?print\\(([^)]*)\\)",
+							"match": "^(.*\\b)?print\\(([^)]*)\\).*$",
 							"comment": "//"
 						}
 					},
-					"description": "List of wrappers for each language"
+					"description": "List of log settings for each language."
 				}
 			}
 		},
