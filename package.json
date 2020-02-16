@@ -21,7 +21,7 @@
 			"properties": {
 				"autolog.prefix": {
 					"type": "string",
-					"default": "AL",
+					"default": "AL: ",
 					"description": "The prefix of the log message."
 				},
 				"autolog.languages": {

@@ -131,10 +131,7 @@ function detectAll(document: vscode.TextDocument, tabSize: any, logRegexp: strin
 }
 
 function wrapText(selection: string, wrapper: string, logPrefix: string): string {
-  const selectionWithPrefix = (
-    logPrefix === "" ? "" : (logPrefix + ": ")
-  )
-  + selection;
+  const selectionWithPrefix = logPrefix + selection;
   return wrapper
     .replace(
       /\$eSEL/g,
