@@ -1,8 +1,8 @@
 _ =
-  Debug.log "weiow" _
+  Debug.log "AL: weiow" _
 
 a =
   let
-    _ =  Debug.log "a" a
+    _ =  Debug.log "AL: a" a
   in
   "hello world"

@@ -21,11 +21,12 @@ function message(
   selectedVar: any,
   lineOfSelectedVar: any,
   tabSize: any,
-  logWrapper: string
+  logWrapper: string,
+  logPrefix: string,
 ) {
   const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar);
   const spacesBeforeMsg = spacesBeforeLog(document, lineOfSelectedVar, tabSize);
-  const debuggingMsg = wrapText(selectedVar, logWrapper);
+  const debuggingMsg = wrapText(selectedVar, logWrapper, logPrefix);
   return `${
     lineOfLogMsg === document.lineCount ? "\n" : ""
   }${spacesBeforeMsg}${debuggingMsg}\n`;
@@ -90,11 +91,15 @@ function spacesBeforeLine(document: vscode.TextDocument, line: number, tabSize: 
 type LogLocation =
 ({ lines: { spaces: string, range: vscode.Range }[]})
 
-function detectAll(document: vscode.TextDocument, tabSize: any, logRegexp: string): LogLocation[]
+function detectAll(document: vscode.TextDocument, tabSize: any, logRegexp: string, logPrefix: string): LogLocation[]
  {
   const documentNbrOfLines = document.lineCount;
   const logMessages: ({ lines: { spaces: string, range: vscode.Range }[]})[] = [];
   const logMessageRegexp = new RegExp(logRegexp);
+  const logPrefixRegexp = new RegExp(`('|"|\`)${logPrefix}.*`);
+  function isAutoLogMessage(msg: string) {
+    return logMessageRegexp.test(msg) && logPrefixRegexp.test(msg);
+  }
   for (let i = 0; i < documentNbrOfLines; i++) {
     const currLine = document.lineAt(i).text;
     const nextLine = (
@@ -103,13 +108,13 @@ function detectAll(document: vscode.TextDocument, tabSize: any, logRegexp: strin
         : document.lineAt(i + 1).text
     );
     const logMessageLines: LogLocation = { lines: [] };
-    if (logMessageRegexp.test(currLine)) {
+    if (isAutoLogMessage(currLine)) {
       logMessageLines.lines.push({
         spaces: spacesBeforeLine(document, i, tabSize),
         range: document.lineAt(i).rangeIncludingLineBreak
       });
       logMessages.push(logMessageLines);
-    } else if (logMessageRegexp.test(currLine + "\n" + nextLine)) {
+    } else if (isAutoLogMessage(currLine + "\n" + nextLine)) {
       logMessageLines.lines.push({
         spaces: spacesBeforeLine(document, i, tabSize),
         range: document.lineAt(i).rangeIncludingLineBreak
@@ -125,11 +130,15 @@ function detectAll(document: vscode.TextDocument, tabSize: any, logRegexp: strin
   return logMessages;
 }
 
-function wrapText(selection: string, wrapper: string): string {
+function wrapText(selection: string, wrapper: string, logPrefix: string): string {
+  const selectionWithPrefix = (
+    logPrefix === "" ? "" : (logPrefix + ": ")
+  )
+  + selection;
   return wrapper
     .replace(
-      /\$eSEL/g, 
-      selection.replace(
+      /\$eSEL/g,
+      selectionWithPrefix.replace(
         /(\"|')/g, 
         "\\$1"
       )

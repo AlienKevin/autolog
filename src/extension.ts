@@ -36,6 +36,8 @@ function init():
   };
 }
 
+const logPrefix = "AL";
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -74,7 +76,8 @@ export function activate(context: vscode.ExtensionContext) {
                 selectedVar,
                 lineOfSelectedVar,
                 tabSize,
-                logWrapper
+                logWrapper,
+                logPrefix
               )
             );
           });
@@ -100,7 +103,8 @@ export function activate(context: vscode.ExtensionContext) {
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
-        logRegexp
+        logRegexp,
+        logPrefix
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ lines }) => {
@@ -134,7 +138,8 @@ export function activate(context: vscode.ExtensionContext) {
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
-        logRegexp
+        logRegexp,
+        logPrefix
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ lines }) => {
