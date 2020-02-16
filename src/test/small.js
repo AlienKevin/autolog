@@ -1,3 +1,4 @@
 const e = `"'weiowe'"`
 console.log('`\"\'weiowe\'\"`', `"'weiowe'"`)
-console.log("wew", e)
+a = 3;
+  console.log("wew", e)

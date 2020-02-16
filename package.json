@@ -24,12 +24,12 @@
 					"default": {
 						"javascript": {
 							"wrapper": "console.log('$eSEL', $SEL)",
-							"match": "^\\s*(\/*\\s*)*console\\.log\\(([^)]*)\\);?",
+							"match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?",
 							"comment": "//"
 						},
 						"typescript": {
 							"wrapper": "console.log('$eSEL', $SEL)",
-							"match": "^\\s*(\/*\\s*)*console\\.log\\(([^)]*)\\);?",
+							"match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?",
 							"comment": "//"
 						},
 						"elm": {
@@ -39,12 +39,12 @@
 						},
 						"python": {
 							"wrapper": "print('$eSEL', $SEL)",
-							"match": "^\\s*print\\(([^)]*)\\)",
+							"match": "^(.*\\b)?print\\(([^)]*)\\)",
 							"comment": "#"
 						},
 						"default": {
 							"wrapper": "print($SEL);",
-							"match": "^\\s*print\\(([^)]*)\\)",
+							"match": "^(.*\\b)?print\\(([^)]*)\\)",
 							"comment": "//"
 						}
 					},
