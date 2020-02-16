@@ -1,7 +1,7 @@
 {
-	"name": "elm-log",
-	"displayName": "elm-log",
-	"description": "Fast debug logging in Elm",
+	"name": "autolog",
+	"displayName": "Auto Log",
+	"description": "Automated logging for any language",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.42.0"
@@ -10,38 +10,75 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.addElmLog",
-		"onCommand:extension.commentAllElmLogs"
+		"onCommand:extension.addLog",
+		"onCommand:extension.commentAllLogs"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "Auto Log Configurations for different languages",
+			"properties": {
+				"autolog.configs": {
+					"type": "object",
+					"default": {
+						"javascript": {
+							"wrapper": "console.log('$eSEL', $SEL)",
+							"match": "^\\s*(\/*\\s*)*console\\.log\\(([^)]*)\\);?",
+							"comment": "//"
+						},
+						"typescript": {
+							"wrapper": "console.log('$eSEL', $SEL)",
+							"match": "^\\s*(\/*\\s*)*console\\.log\\(([^)]*)\\);?",
+							"comment": "//"
+						},
+						"elm": {
+							"wrapper": "_ = Debug.log \"$eSEL\" <| $SEL",
+							"match": "^.*=\\s*(\n\\s*)?(\\-*\\s*)*Debug\\.log.*",
+							"comment": "--"
+						},
+						"python": {
+							"wrapper": "print('$eSEL', $SEL)",
+							"match": "^\\s*print\\(([^)]*)\\)",
+							"comment": "#"
+						},
+						"default": {
+							"wrapper": "print($SEL);",
+							"match": "^\\s*print\\(([^)]*)\\)",
+							"comment": "//"
+						}
+					},
+					"description": "List of wrappers for each language"
+				}
+			}
+		},
 		"commands": [
 			{
-				"command": "extension.addElmLog",
-				"title": "Add Elm Log"
+				"command": "extension.addLog",
+				"title": "Add Log"
 			},
 			{
-				"command": "extension.commentAllElmLogs",
-				"title": "Comment All Elm Logs"
+				"command": "extension.commentAllLogs",
+				"title": "Comment All Logs"
 			},
 			{
-				"command": "extension.uncommentAllElmLogs",
-				"title": "Uncomment All Elm Logs"
+				"command": "extension.uncommentAllLogs",
+				"title": "Uncomment All Logs"
 			}
 		],
 		"keybindings": [
 			{
-				"command": "extension.addElmLog",
+				"command": "extension.addLog",
 				"key": "ctrl+alt+l",
 				"mac": "ctrl+alt+l"
 			},
 			{
-        "command": "extension.commentAllElmLogs",
+        "command": "extension.commentAllLogs",
         "key": "alt+shift+c",
         "mac": "alt+shift+c"
 			},
 			{
-        "command": "extension.uncommentAllElmLogs",
+        "command": "extension.uncommentAllLogs",
         "key": "alt+shift+u",
         "mac": "alt+shift+u"
       }

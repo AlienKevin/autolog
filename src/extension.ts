@@ -3,14 +3,51 @@
 import * as vscode from 'vscode';
 import * as logMessage from "./logMessage";
 
+type LogConfig =
+  {
+    "wrapper": string,
+    "match": string,
+    "command": string,
+    "comment": string
+  }
+
+function init():
+  {
+    editor: vscode.TextEditor,
+    logWrapper: string,
+    logRegexp: string,
+    commentSymbol: string
+  } | undefined
+ {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return undefined;
+  }
+  var {
+    wrapper: logWrapper,
+    match: logRegexp,
+    comment: commentSymbol } =
+  getLogConfig(editor.document.languageId);
+  return {
+    editor,
+    logWrapper,
+    logRegexp,
+    commentSymbol
+  };
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	vscode.commands.registerCommand('extension.addElmLog', async () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
+	vscode.commands.registerCommand('extension.addLog', async () => {
+      var vars = init();
+      if (vars === undefined) {
         return;
+      } else {
+        var {
+          editor,
+          logWrapper,
+        } = vars;
       }
       const tabSize = editor.options.tabSize;
       const document = editor.document;
@@ -36,7 +73,8 @@ export function activate(context: vscode.ExtensionContext) {
                 document,
                 selectedVar,
                 lineOfSelectedVar,
-                tabSize
+                tabSize,
+                logWrapper
               )
             );
           });
@@ -45,17 +83,24 @@ export function activate(context: vscode.ExtensionContext) {
   });
   
   vscode.commands.registerCommand(
-    "extension.commentAllElmLogs",
+    "extension.commentAllLogs",
     () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
+      var vars = init();
+      if (vars === undefined) {
         return;
+      } else {
+        var {
+          editor,
+          logRegexp,
+          commentSymbol,
+        } = vars;
       }
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessages = logMessage.detectAll(
         document,
-        tabSize
+        tabSize,
+        logRegexp
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ lines }) => {
@@ -63,7 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
             editBuilder.delete(range);
             editBuilder.insert(
               new vscode.Position(range.start.line, 0),
-              `${spaces}-- ${document.getText(range).trim()}\n`
+              `${spaces}${commentSymbol} ${document.getText(range).trim()}\n`
             );
           });
         });
@@ -72,17 +117,24 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   vscode.commands.registerCommand(
-    "extension.uncommentAllElmLogs",
+    "extension.uncommentAllLogs",
     () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
+      var vars = init();
+      if (vars === undefined) {
         return;
+      } else {
+        var {
+          editor,
+          logRegexp,
+          commentSymbol,
+        } = vars;
       }
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessages = logMessage.detectAll(
         document,
-        tabSize
+        tabSize,
+        logRegexp
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ lines }) => {
@@ -92,7 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
               new vscode.Position(range.start.line, 0),
               `${spaces}${document
                 .getText(range)
-                .replace(/\-\-/g, "")
+                .replace(new RegExp(commentSymbol, "g"), "")
                 .trim()}\n`
             );
           });
@@ -100,6 +152,23 @@ export function activate(context: vscode.ExtensionContext) {
       });
     }
   );
+}
+
+function getLogConfig(lang: string): LogConfig {
+  let configs: any = convertKeysToLowerCase(vscode.workspace.getConfiguration("autolog.configs"));
+  return configs[lang.toLowerCase()] || configs['default'];
+}
+
+// source: https://stackoverflow.com/a/12540603/6798201
+function convertKeysToLowerCase(obj: {[key: string]: any}) {
+  var key, keys = Object.keys(obj);
+  var n = keys.length;
+  var newObj: {[key: string]: any} ={}
+  while (n--) {
+    key = keys[n];
+    newObj[key.toLowerCase()] = obj[key];
+  }
+  return newObj;
 }
 
 // this method is called when your extension is deactivated
