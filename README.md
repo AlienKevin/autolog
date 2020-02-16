@@ -1,65 +1,75 @@
 # Auto Log
 
-This is the README for your extension "autolog". After writing up a brief description, we recommend including the following sections.
+Automated logging for any language in VS Code.
 
-## Features
+# Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+By pressing <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>l</kbd>, you can **insert** a log message for different languages, formatted and indented.
 
-For example if there is an image subfolder under your extension project workspace:
+By pressing <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>c</kbd>, you can **comment** out all log messages created by Auto Log.
 
-\!\[feature X\]\(images/feature-x.png\)
+By pressing <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>u</kbd>, you can **uncomment** out all log messages created by Auto Log.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+# Extension Settings
 
-## Requirements
+- `autolog.languages`: list of log settings for each language
+  - `$eSEL`: escaped selection (`"`, `'`, `` ` `` are escaped)
+  - `$SEL`: non-escaped selection
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+  Format:
+  ```json
+  {
+    "<language_name>": {
+      "wrapper": "<(Required) format of log messages>",
+      "match": "<(Required) regular expression matching a log message, used for commenting and uncommenting>. Reference the default regexps below on how to write one.",
+      "comment": "<(Required) single line comment symbol.>",
+      "prefix": "<(Optional) log prefix for this language.>"
+    }
+  }
+  ```
 
-## Extension Settings
+  Default value:
+  ```json
+  {
+    "javascript": {
+      "wrapper": "console.log('$eSEL', $SEL)",
+      "match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?.*$",
+      "comment": "//"
+    },
+    "typescript": {
+      "wrapper": "console.log('$eSEL', $SEL)",
+      "match": "^(.*\\b)?console\\.log\\(([^)]*)\\);?.*$",
+      "comment": "//"
+    },
+    "elm": {
+      "wrapper": "_ = Debug.log \"$eSEL\" <| $SEL",
+      "match": "^.*=\\s*(\n\\s*)?(\\-*\\s*)*Debug\\.log.*$",
+      "comment": "--",
+      "prefix": "AL -> "
+    },
+    "python": {
+      "wrapper": "print('$eSEL', $SEL)",
+      "match": "^(.*\\b)?print\\(([^)]*)\\).*$",
+      "comment": "#"
+    },
+    "default": {
+      "wrapper": "print($SEL);",
+      "match": "^(.*\\b)?print\\(([^)]*)\\).*$",
+      "comment": "//"
+    }
+  }
+  ```
+  Default will be used if Auto Log doesn't find the log settings for the selected language. Follow the format to specify log settings for the languages you want that are not listed in the default value above. PRs are welcome for adding more default language log settings.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+- `autolog.prefix`: Prefix used for all languages' logs, except those with `prefix` property defined in the `autolog.languages`.
 
-For example:
+  Format: string
 
-This extension contributes the following settings:
+  Default value: `"AL: "`
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+# License
+MIT
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+# Credit
+- [Turbo Console Log](https://github.com/Chakroun-Anas/turbo-console-log)
+- [Log Wrapper](https://github.com/chrisvltn/vs-code-log-wrapper)
