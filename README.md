@@ -1,5 +1,7 @@
 # Auto Log
 
+![Auto Log Logo](./media/logo.png)
+
 Automated logging for any language in VS Code.
 
 # Features
