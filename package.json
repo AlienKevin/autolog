@@ -40,7 +40,8 @@
 						"elm": {
 							"wrapper": "_ = Debug.log \"$eSEL\" <| $SEL",
 							"match": "^.*=\\s*(\n\\s*)?(\\-*\\s*)*Debug\\.log.*$",
-							"comment": "--"
+							"comment": "--",
+							"prefix": "AL -> "
 						},
 						"python": {
 							"wrapper": "print('$eSEL', $SEL)",

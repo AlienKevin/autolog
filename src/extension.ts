@@ -168,7 +168,7 @@ function getLogConfig(lang: string): LogConfig {
   let languageConfigs: any = convertKeysToLowerCase(vscode.workspace.getConfiguration("autolog").languages);
   const languageConfig = languageConfigs[lang.toLowerCase()] || languageConfigs['default'];
   const prefix = vscode.workspace.getConfiguration("autolog").prefix;
-  return { ...languageConfig, ...{ prefix } };
+  return { ...{ prefix }, ...languageConfig };
 }
 
 // source: https://stackoverflow.com/a/12540603/6798201
