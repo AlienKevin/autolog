@@ -3,6 +3,6 @@ _ =
 
 a =
   let
-    _ = Debug.log "a" a
+    _ =  Debug.log "a" a
   in
   "hello world"

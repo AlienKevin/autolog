@@ -70,6 +70,36 @@ export function activate(context: vscode.ExtensionContext) {
       });
     }
   );
+
+  vscode.commands.registerCommand(
+    "extension.uncommentAllElmLogs",
+    () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        return;
+      }
+      const tabSize = editor.options.tabSize;
+      const document = editor.document;
+      const logMessages = logMessage.detectAll(
+        document,
+        tabSize
+      );
+      editor.edit(editBuilder => {
+        logMessages.forEach(({ lines }) => {
+          lines.forEach(({ spaces, range }) => {
+            editBuilder.delete(range);
+            editBuilder.insert(
+              new vscode.Position(range.start.line, 0),
+              `${spaces}${document
+                .getText(range)
+                .replace(/\-\-/g, "")
+                .trim()}\n`
+            );
+          });
+        });
+      });
+    }
+  );
 }
 
 // this method is called when your extension is deactivated

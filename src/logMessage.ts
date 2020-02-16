@@ -93,7 +93,7 @@ function detectAll(document: vscode.TextDocument, tabSize: any): LogLocation[]
  {
   const documentNbrOfLines = document.lineCount;
   const logMessages: ({ lines: { spaces: string, range: vscode.Range }[]})[] = [];
-  const logMessageRegexp = new RegExp(`^.*=\\s*\n?Debug.log.*`);
+  const logMessageRegexp = new RegExp(`^.*=\\s*(\n\\s*)?\-*\\s*Debug.log.*`);
   for (let i = 0; i < documentNbrOfLines; i++) {
     const currLine = document.lineAt(i).text;
     const nextLine = (
